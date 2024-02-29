@@ -26,11 +26,11 @@ namespace AppointmentScheduling.Services
 
             return doctors;
 
-            //var doctors = _db.Users.Join(_db.UserRoles, Id => Id, Name => Name, (Id, Name) => new {Id, Name})
-            //    .Select(d => new DoctorVM 
-            //    { 
-            //        Id = d.Id, 
-            //        Name = d.Name 
+            //var doctors = _db.Users.Join(_db.UserRoles, id => id.Id, name => name.UserId, (id, name) => new { id.Id, name.UserId })
+            //    .Select(d => new DoctorVM
+            //    {
+            //        Id = d.Id,
+            //        Name = d.Name
             //    }).ToList();
 
             //return doctors;
@@ -38,7 +38,17 @@ namespace AppointmentScheduling.Services
 
         public List<PatientVM> GetPatientList()
         {
-            throw new NotImplementedException();
+            var patients = (from user in _db.Users
+                            join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
+                            join roles in _db.Roles.Where(x => x.Name == Helper.Patient) on userRoles.RoleId equals roles.Id
+                            select new PatientVM
+                            {
+                                Id = user.Id,
+                                Name = user.Name
+                            }
+               ).ToList();
+
+            return patients;
         }
     }
 }
